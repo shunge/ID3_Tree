@@ -27,7 +27,7 @@ def getMajority(data):
 
 def chooseBestAttr(data, attributes):
 	best = None
-	minEntropy = 1
+	minEntropy = 1.7976931348623157e+308
 	for attr in attributes:
 		newEntropy = totalEntropy(data, attr)
 		if newEntropy < minEntropy:
@@ -131,11 +131,13 @@ def printTree(root):
 
 def main():
 	loadData()
+	print totalEntropy(trainingData, [0, 4.35])
 	root = ID3Tree(trainingData, attributes)
 
 	#printTree(root)
 
 main()
+
 
 
 
