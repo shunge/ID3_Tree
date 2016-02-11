@@ -1,7 +1,7 @@
 import math
 
 trainingData = []
-attributesData = []
+attributes = []
 
 
 
@@ -15,7 +15,6 @@ class Node:
 
 def getMajority(data):
 	count = [0,0,0]
-
 	for d in data:
 		if(d[4] == 1):
 			count[0] += 1
@@ -30,8 +29,8 @@ def chooseBestAttr(data, attributes):
 	best = None
 	minEntropy = 1
 	for attr in attributes:
-		newEntropy = totalEntropy(data, attributes)
-		if newEntropy > minEntropy:
+		newEntropy = totalEntropy(data, attr)
+		if newEntropy < minEntropy:
 			minEntropy = newEntropy
 			best = attr
 	return best
@@ -62,87 +61,81 @@ def buildID3Tree(data, attributes, root):
 	else:
 		best = chooseBestAttr(data, attributes)
 		subData = splitData(data, best)
-		newAttr = attribute[:]
+		newAttr = attributes[:]
 		newAttr.remove(best)
 		root.attribute = best 
 		root.left = Node(root)
 		root.right = Node(root)
 		buildID3Tree(subData[0],newAttr,root.left)
-		buildID3Tree(subData[0],newAttr,root.right)
-
+		buildID3Tree(subData[1],newAttr,root.right)
 	return
 
 
 def ID3Tree(data, attributes):
-	return (data, attributes, Node())
-
-
+	root = Node()
+	buildID3Tree(data, attributes, root)
+	return root
 
 def loadData():
     f = open('hw3train.txt', 'r')
+    global trainingData, attributes
     trainingData = [map(float, line.split()) for line in f]
-    listx1 = []
-    listx2 = []
-    listx3 = []
-    listx4 = []
-    length = len(listx1)
+    lists = [list() for _ in xrange(4)]
+
     for data in trainingData:
-        listx1.append(data[0])
-        listx2.append(data[1])
-        listx3.append(data[2])
-        listx4.append(data[3])
-    for i in range(length-1):
-        trainingData.append([1, ((listx1[i]+listx1[i+1])/2)])
-        trainingData.append([2, ((listx2[i]+listx2[i+1])/2)])
-        trainingData.append([3, ((listx3[i]+listx3[i+1])/2)])
-        trainingData.append([4, ((listx4[i]+listx4[i+1])/2)])
-
-
+    	for i in range(len(lists)):
+    		lists[i].append(data[i])
+	for i in range(len(lists)):
+		lists[i].sort()
+    for i in range(len(lists[0])-1):
+    	for j in range(len(lists)):
+    		attributes.append([j, (lists[j][i]+lists[j][i+1])/2])
 
 def entropy(a, b, c):
     sum = float(a+b+c)
+    if(sum == 0):
+    	return 0
     a = float(a/sum)
     b = float(b/sum)
     c = float(c/sum)
-    entro = - (a) * math.log(a, 2) \
-            - (b) * math.log(b, 2) - (c) * math.log(c, 2)
+    entro = 0
+    if(a!=0):
+    	entro += - (a) * math.log(a, 2)
+    if(b!=0):
+    	entro += - (b) * math.log(b, 2)
+    if(c!=0):
+    	entro += - (c) * math.log(c, 2)
     return entro
 
-def totalentropy(rawdata, attr):
+def totalEntropy(rawdata, attr):
     intlist = [0] * 6
-    sum = 0
+    total = 0
     for data in rawdata:
-        label = data[:-1]
+        label = data[4]
         if data[attr[0]] > attr[1]:
-            if label == 1:
-                intlist[0] +=1
-            elif label == 2:
-                intlist[1] +=1
-            else:
-                intlist[2] +=1
+        	intlist[int(label)-1] += 1
         else:
-            if label == 1:
-                intlist[3] +=1
-            elif label == 2:
-                intlist[4] +=1
-            else:
-                intlist[5] +=1
-    for int in intlist:
-        sum+=int
-    ProbGre =  float((intlist[0]+intlist[1]+intlist[2])/sum)
-    ProbLeq =  float((intlist[3]+intlist[4]+intlist[5])/sum)
+        	intlist[int(label)+2] += 1
+
+    for i in intlist:
+        total+=i
+    ProbGre =  float((intlist[0]+intlist[1]+intlist[2])/total)
+    ProbLeq =  float((intlist[3]+intlist[4]+intlist[5])/total)
     return ProbGre*entropy(intlist[0],intlist[1],intlist[2]) \
             + ProbLeq*entropy(intlist[3],intlist[4],intlist[5])
 
 def printTree(root):
+
     return
 
 
 def main():
-    root = ID3Tree()
-    printTree()
+	loadData()
+	root = ID3Tree(trainingData, attributes)
 
+	#printTree(root)
 
+main()
 
 
 
