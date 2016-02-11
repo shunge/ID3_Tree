@@ -13,6 +13,22 @@ class Node:
 		self.attribute = None
 		self.label = None
 
+class Queue:
+    def __init__(self):
+        self.items = []
+
+    def isEmpty(self):
+        return self.items == []
+
+    def enqueue(self, item):
+        self.items.insert(0,item)
+
+    def dequeue(self):
+        return self.items.pop()
+
+    def size(self):
+        return len(self.items)
+
 def getMajority(data):
 	count = [0,0,0]
 	for d in data:
@@ -126,16 +142,36 @@ def totalEntropy(rawdata, attr):
             + ProbLeq*entropy(intlist[3],intlist[4],intlist[5])
 
 def printTree(root):
-
-    return
+	q = Queue()
+	q.enqueue(root)
+	while(q.isEmpty() != True):
+		current = q.dequeue()
+		if(current.parent == None):
+			print "root"
+		elif(current == current.parent.left):
+			print "parent: ",
+			print current.parent.attribute
+			print "left ",
+		else:
+			print "parent: ",
+			print current.parent.attribute
+			print "right",
+		if(current.attribute != None):
+			print current.attribute
+		else:
+			print current.label
+		if(current.left != None):
+			q.enqueue(current.left)
+		if(current.right != None):
+			q.enqueue(current.right)
 
 
 def main():
 	loadData()
 	root = ID3Tree(trainingData, attributes)
+	printTree(root)
 
-	#printTree(root)
-
+main()
 
 
 
