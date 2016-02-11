@@ -98,7 +98,7 @@ def entropy(a, b, c):
     a = float(a/sum)
     b = float(b/sum)
     c = float(c/sum)
-    entro = 0
+    entro = float(0)
     if(a!=0):
     	entro += - (a) * math.log(a, 2)
     if(b!=0):
@@ -119,8 +119,9 @@ def totalEntropy(rawdata, attr):
 
     for i in intlist:
         total+=i
-    ProbGre =  float((intlist[0]+intlist[1]+intlist[2])/total)
-    ProbLeq =  float((intlist[3]+intlist[4]+intlist[5])/total)
+    ProbGre =  float((intlist[0]+intlist[1]+intlist[2])/float(total))
+    ProbLeq =  float((intlist[3]+intlist[4]+intlist[5])/float(total))
+
     return ProbGre*entropy(intlist[0],intlist[1],intlist[2]) \
             + ProbLeq*entropy(intlist[3],intlist[4],intlist[5])
 
@@ -131,12 +132,10 @@ def printTree(root):
 
 def main():
 	loadData()
-	print totalEntropy(trainingData, [0, 4.35])
 	root = ID3Tree(trainingData, attributes)
 
 	#printTree(root)
 
-main()
 
 
 
