@@ -1,6 +1,7 @@
 import math
 
 trainingData = []
+testingData = []
 attributes = []
 
 
@@ -12,6 +13,7 @@ class Node:
 		self.right = None
 		self.attribute = None
 		self.label = None
+		self.count = 0
 
 class Queue:
     def __init__(self):
@@ -93,8 +95,10 @@ def ID3Tree(data, attributes):
 	return root
 
 def loadData():
+    global trainingData, attributes, testingData
+    f = open('hw3test.txt', 'r')
+    testingData = [map(float, line.split()) for line in f]
     f = open('hw3train.txt', 'r')
-    global trainingData, attributes
     trainingData = [map(float, line.split()) for line in f]
     lists = [list() for _ in xrange(4)]
 
@@ -159,17 +163,41 @@ def printTree(root):
 		if(current.attribute != None):
 			print current.attribute
 		else:
-			print current.label
+			print current.label,
+			print " ",
+			print current.count
 		if(current.left != None):
 			q.enqueue(current.left)
 		if(current.right != None):
 			q.enqueue(current.right)
 
+def checkLabel(data, root):
+	itr = root
+	while(True):
+		if(itr.label != None):
+			itr.count += 1
+			return itr.label
+		index = itr.attribute[0]
+		value = itr.attribute[1]
+		if(data[index]<=value):
+			itr = itr.left
+		else:
+			itr = itr.right
 
 def main():
 	loadData()
 	root = ID3Tree(trainingData, attributes)
+	for data in trainingData:
+		checkLabel(data, root)
 	printTree(root)
+
+	count = 0
+	for data in testingData:
+		predictLabel = checkLabel(data, root)
+		if(predictLabel == data[4]):
+			count+=1
+	print "testing error: ",
+	print 1-float(count)/len(testingData)
 
 main()
 
